@@ -201,13 +201,13 @@ calcTrendRaster <- function(r,method="theil_sen",var_name="slope",file_format=".
   ########## Write out
       
   if(is.null(raster_name)){
-    out_raster_name <- paste(var_name,"_",i,file_format,sep="") 
+    out_raster_name <- paste(var_name,file_format,sep="") 
   }else{
     out_raster_name <- sub(file_format,"",raster_name)
-    out_raster_name <- paste(out_raster_name,"_",i,file_format,sep="") 
+    out_raster_name <- paste(out_raster_name,file_format,sep="") 
   }
       
-      #if(multiband==TRUE){
+  #if(multiband==TRUE){
       #  #raster_name_tmp <- basename(rast_name_var)
       #  #raster_name <- basename(sub(file_format,"",raster_name))
       #  if(out_suffix!=""){
@@ -217,16 +217,28 @@ calcTrendRaster <- function(r,method="theil_sen",var_name="slope",file_format=".
       # }
       #  bylayer_val <- FALSE #don't write out separate layer files for each "band"
       #  rast_list <- file.path(out_dir,raster_name_tmp) #as return from function
-      #}
-      suffix_str <- names(r_out)
+  #}
+  suffix_str <- names(r_out)
       
   if(multiband==FALSE){
     out_raster_name <- sub(file_format,"",out_raster_name)
     raster_name_tmp <- paste(out_raster_name,file_format,sep="") #don't add output suffix because in suffix_str
     bylayer_val <- TRUE #write out separate layer files for each "band"
     rast_list <- file.path(out_dir,(paste(out_raster_name,"_",suffix_str,file_format,sep=""))) 
+  }else{
+    rast_list <- out_raster_name
   }
       
+  #Use compression option for tif
+  writeRaster(r_out,
+              filename=file.path(out_dir,raster_name_tmp),
+              bylayer=bylayer_val,
+              suffix=suffix_str,
+              overwrite=TRUE,
+              #NAflag=NA_flag_val,
+              #datatype=data_type_str,
+              options=c("COMPRESS=LZW"))
+  
   #### return object
   
   return(rast_list)
