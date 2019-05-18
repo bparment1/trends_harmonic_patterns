@@ -294,7 +294,7 @@ calcHarmonicRaster <- function(r,harmonic_val=NULL,var_name="A",window_val=23,fi
   ############ Start script ##################
   
   if(!is.null(window_val)){
-    
+      
     seq_val <- 1:nlayers(r)
     #debug(split_sequence)
     split_obj <- split_sequence(seq_val,n=n_val)
@@ -371,7 +371,7 @@ calcHarmonicRaster <- function(r,harmonic_val=NULL,var_name="A",window_val=23,fi
     rast_list <- unlist(list_rast_out) 
   }
   
-  ##### now splitting of raster time series stack
+  ##### If no window defined, just use the brick/stack
   
   if(is.null(window_val)){
     r_out <- try(calc(r, 
@@ -380,6 +380,15 @@ calcHarmonicRaster <- function(r,harmonic_val=NULL,var_name="A",window_val=23,fi
                                                           n=nlayers(r),
                                                           harmonic=harmonic_val)}))
     names(r_out) <- paste0(var_name,"_",1:nlayers(r_out))
+    suffix_str <- names(r_out)
+    
+    if(is.null(raster_name)){
+      out_raster_name <- paste(var_name,"_",file_format,sep="") 
+    }else{
+      out_raster_name <- raster_name
+      #out_raster_name <- sub(file_format,"",raster_name)
+      #out_raster_name <- paste(out_raster_name,"_",i,file_format,sep="") 
+    }
     
     if(multiband==FALSE){
       out_raster_name <- sub(file_format,"",out_raster_name)
@@ -387,9 +396,7 @@ calcHarmonicRaster <- function(r,harmonic_val=NULL,var_name="A",window_val=23,fi
       bylayer_val <- TRUE #write out separate layer files for each "band"
       rast_list <- file.path(out_dir,(paste(out_raster_name,"_",suffix_str,file_format,sep=""))) 
     }
-    
-    suffix_str <- names(r_out)
-    
+
     #Use compression option for tif
     writeRaster(r_out,
                 filename=file.path(out_dir,raster_name_tmp),
