@@ -121,7 +121,8 @@ plot(r,y=1)
 NAvalue(r)
 plot(r,y=1,colNA="black")
 
-#### PART II: Generate amplitudes and phases
+############################
+#### PART II: Generate amplitudes and phases by year and overall
 
 harmonic_val <- NULL
 var_name <- "A"
@@ -147,7 +148,7 @@ list_r_amplitude
 harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
 #raster_name <- NULL
-raster_name <- "NDVI_year.tif"
+raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- 23
@@ -168,46 +169,19 @@ r_phase <- stack(list_r_phase)
 plot(r_phase)
 plot(r_phase,y=1)
 
+
+
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
 
-#data_df <- read.table(infile_name_df,header=T,sep=",",stringsAsFactors = F)
-#names(data_df)
-#start_date <- "2004-01-01"
-#start_date <- "2012-11-01"  #new data starts in November 2012
-
-#y ~ A0 + b1 cos(x) + b2* sin(x)
-#y ~ b0 + b1*x1 + b2*x2
-
-y_all <- as.numeric(data_df[1400,1:230])
-y_all
-
-y <- y_all
-#debug(calculate_trend)
-test1 <- calculate_trend(y,mod_obj=FALSE,method="theil_sen")
-test2 <- calculate_trend(y,mod_obj=FALSE,method="ols")
-
-var_name="slope"
-test <- calc(r,FUN=trend_reg_raster)
-
-#debug(trend_reg_raster)
-test5 <- trend_reg_raster(y,var_name,method="ols")
-
-r_out <- try(calc(r, 
-                  fun=function(y){trend_reg_raster(y,
-                                                    var_name=var_name,
-                                                      method=method)}))
-
-plot(r_out)
-calcTrendRaster
-
-raster_name <- "NDVI_trend.tif"
+raster_name <- "Ouagadougou_NDVI_MOD13A1_trend.tif"
 file_format <- ".tif"
 method <- "theil_sen"
 var_name <- "slope"
 
 #undebug(calcTrendRaster)
-list_r_ols_NDVI <- calcTrendRaster(r,
+
+r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 method=method,
                 var_name=var_name,
                 file_format=file_format,
@@ -215,9 +189,22 @@ list_r_ols_NDVI <- calcTrendRaster(r,
                 num_cores=1,
                 raster_name=raster_name,
                 out_dir=out_dir)
-list_r_ols_NDVI <- "/nfs/bparmentier-data/Data/projects/managing_hurricanes/outputs/output_example_ts_05142019/NDVI_trend_slope_theil_sen.tif"  
-list_r_ols_NDVI <- raster(list_r_ols_NDVI)
 
+raster_name <- "Ouagadougou_NDVI_MOD13A1_trend.tif"
+file_format <- ".tif"
+method <- "ols"
+var_name <- "slope"
+
+r_overall_ols_NDVI <- calcTrendRaster(r,
+                                      method=method,
+                                      var_name=var_name,
+                                      file_format=file_format,
+                                      multiband=F,
+                                      num_cores=1,
+                                      raster_name=raster_name,
+                                      out_dir=out_dir)
+
+### Now trend by STA parameters:
 
 ################################### End of script #######################################
 
