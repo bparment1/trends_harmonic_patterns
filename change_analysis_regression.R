@@ -144,7 +144,6 @@ list_r_amplitude <- calcHarmonicRaster(r,
                    raster_name=raster_name,
                    out_dir=out_dir)
 
-list_r_amplitude
 harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
 #raster_name <- NULL
@@ -165,11 +164,52 @@ list_r_phase <- calcHarmonicRaster(r,
                              raster_name=raster_name,
                              out_dir=out_dir)
 
+
 r_phase <- stack(list_r_phase)
 plot(r_phase)
 plot(r_phase,y=1)
 
+###################### Overall amplitude 
 
+list_r_amplitude
+harmonic_val <- NULL
+var_name <- "A" #will be included in name
+#raster_name <- NULL
+raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_year.tif"
+file_format <- ".tif"
+multiband <- FALSE
+window_val <- NULL #use overall time series
+
+r_overall_amplitude <- calcHarmonicRaster(r,
+                                       harmonic_val=harmonic_val,
+                                       var_name=var_name,
+                                       window_val=window_val,
+                                       file_format=file_format,
+                                       multiband=multiband,
+                                       num_cores=num_cores,
+                                       raster_name=raster_name,
+                                       out_dir=out_dir)
+
+
+###################### Overall phase 
+
+harmonic_val <- NULL
+var_name <- "phase" #will be included in name
+#raster_name <- NULL
+raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
+file_format <- ".tif"
+multiband <- FALSE
+window_val <- NULL #use overall time series
+
+r_overall_phase <- calcHarmonicRaster(r,
+                                      harmonic_val=harmonic_val,
+                                      var_name=var_name,
+                                      window_val=window_val,
+                                      file_format=file_format,
+                                      multiband=multiband,
+                                      num_cores=num_cores,
+                                      raster_name=raster_name,
+                                      out_dir=out_dir)
 
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
