@@ -289,23 +289,31 @@ r_overall_ols_NDVI <- calcTrendRaster(r,
 ################### PART V: Generate trend from phase and amplitude parameters
 ### Now trend by STA parameters:
 
-lf_phase1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif")
-lf_phase2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif")
+lf_amp0_wt <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_1.*.tif"))
+lf_amp0_wt <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_2.*.tif"))
 
-lf_amp2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif")
-lf_amp1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif")
-lf_amp0_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_0.tif")
+lf_amp1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif"))
+lf_amp2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif"))
+lf_phase1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif"))
+lf_phase2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif"))
 
+list_params <- list(lf_amp0_w,lf_amp1_w,lf_amp2_w,lf_phase1_w,lf_phase2_w)
+names(list_params) <- c("A0","A1","A2","phase1","phase2")
 
+no_param <- length(list_params)
 
 for(i in 1:no_param){
-  raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
+  
+  param_name <- names(list_params[i])
+
+  raster_name <- paste0("Ouagadougou_NDVI_MOD13A1_trend_ts_",param_name,file_format)
+  
   file_format <- ".tif"
   method <- "theil_sen"
   var_name <- "slope"
   
   #undebug(calcTrendRaster)
-  
+  r <- stack(list_params[[i]])
   r__theilsen_NDVI <- calcTrendRaster(r,
                                              method=method,
                                              var_name=var_name,
@@ -315,7 +323,8 @@ for(i in 1:no_param){
                                              raster_name=raster_name,
                                              out_dir=out_dir)
   
-  raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
+  raster_name <- paste0("Ouagadougou_NDVI_MOD13A1_trend_ols_",param_name,file_format)
+  
   file_format <- ".tif"
   method <- "ols"
   var_name <- "slope"
