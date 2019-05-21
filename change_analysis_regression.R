@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/18/2019
+## DATE MODIFIED: 05/20/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -109,7 +109,7 @@ if(create_out_dir_param==TRUE){
 ### PART I READ AND PREPARE DATA #######
   #set up the working directory
 #Create output directory
-
+  
 infile_name_raster <- file.path(in_dir,infile_name_raster)
 #
 #data_df <- read.table(infile_name,header=T,sep=",",stringsAsFactors = F)
@@ -119,10 +119,36 @@ names(r)
 
 plot(r,y=1)
 NAvalue(r)
-plot(r,y=1,colNA="black")
+plot(r,y=14,colNA="black")
 
 ############################
 #### PART II: Generate amplitudes and phases by year and overall
+
+#####################
+#### Generate Amplitude 0 (annual mean in this context)
+
+harmonic_val <- NULL
+var_name <- "A0" #mean value from Harmonic Fourier
+#raster_name <- NULL
+raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_year.tif"
+file_format <- ".tif"
+multiband <- FALSE
+window_val <- 23
+
+#debug(calcHarmonicRaster)
+
+list_r_amplitude <- calcHarmonicRaster(r,
+                                       harmonic_val=harmonic_val,
+                                       var_name=var_name,
+                                       window_val=window_val,
+                                       file_format=file_format,
+                                       multiband=multiband,
+                                       num_cores=num_cores,
+                                       raster_name=raster_name,
+                                       out_dir=out_dir)
+
+###################
+#### Generate Amplitudes A1 and A2 (seaonality and bi-annual signal)
 
 harmonic_val <- NULL
 var_name <- "A"
@@ -143,6 +169,9 @@ list_r_amplitude <- calcHarmonicRaster(r,
                    num_cores=num_cores,
                    raster_name=raster_name,
                    out_dir=out_dir)
+
+####################
+#### Generate Phase 1 and phase 2 (seaonality and bi-annual signal)
 
 harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
@@ -169,7 +198,12 @@ r_phase <- stack(list_r_phase)
 plot(r_phase)
 plot(r_phase,y=1)
 
-###################### Overall amplitude 
+
+############################
+#### PART III : Generate amplitudes and phases by year and overall
+
+##########################
+#### Generate Overall amplitude A1 and A2 (seaonality and bi-annual signal)
 
 list_r_amplitude
 harmonic_val <- NULL
@@ -193,8 +227,9 @@ r_overall_amplitude <- calcHarmonicRaster(r,
                                          out_dir=out_dir)
 
 
-###################### Overall phase 
-#12:14
+######################
+#### Generate Overall phase A1 and A2 (seaonality and bi-annual signal)
+
 #end:
 harmonic_val <- NULL
 var_name <- "phase" #will be included in name
@@ -213,6 +248,9 @@ r_overall_phase <- calcHarmonicRaster(r,
                                       num_cores=num_cores,
                                       raster_name=raster_name,
                                       out_dir=out_dir)
+
+############################
+#### PART IV: Get overall trend
 
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
@@ -248,7 +286,7 @@ r_overall_ols_NDVI <- calcTrendRaster(r,
                                       out_dir=out_dir)
 
 
-################### PART V:
+################### PART V: Generate trend from phase and amplitude parameters
 ### Now trend by STA parameters:
 
 lf_phase1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif")
@@ -256,6 +294,8 @@ lf_phase2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif
 
 lf_amp2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif")
 lf_amp1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif")
+lf_amp0_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_0.tif")
+
 
 
 for(i in 1:no_param){
