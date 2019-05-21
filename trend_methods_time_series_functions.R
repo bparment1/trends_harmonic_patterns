@@ -228,16 +228,30 @@ calcTrendRaster <- function(r,method="theil_sen",var_name="slope",file_format=".
   }else{
     rast_list <- out_raster_name
   }
-      
-  #Use compression option for tif
-  writeRaster(r_out,
-              filename=file.path(out_dir,raster_name_tmp),
-              bylayer=bylayer_val,
-              suffix=suffix_str,
-              overwrite=TRUE,
-              #NAflag=NA_flag_val,
-              #datatype=data_type_str,
-              options=c("COMPRESS=LZW"))
+  
+  if(nlayers(r_out)>1){
+    #Use compression option for tif
+    writeRaster(r_out,
+                filename=file.path(out_dir,raster_name_tmp),
+                bylayer=bylayer_val,
+                suffix=suffix_str,
+                overwrite=TRUE,
+                #NAflag=NA_flag_val,
+                #datatype=data_type_str,
+                options=c("COMPRESS=LZW"))
+    
+  }else{
+    #Use compression option for tif
+    writeRaster(r_out,
+                filename=file.path(out_dir,basename(rast_list)),
+                #bylayer=bylayer_val,
+                #suffix=suffix_str,
+                overwrite=TRUE,
+                #NAflag=NA_flag_val,
+                #datatype=data_type_str,
+                options=c("COMPRESS=LZW"))
+    
+  }    
   
   #### return object
   
