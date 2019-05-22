@@ -4,7 +4,7 @@
 ## Performing harmonic regression time series data to evaluate amplitudes and phases for Managing Hurriance Group.
 ##
 ## DATE CREATED: 10/01/2018
-## DATE MODIFIED: 05/14/2019
+## DATE MODIFIED: 05/22/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Time series analysis Managing Hurricanes
@@ -95,30 +95,36 @@ fit_harmonic <- function(p,n,y,mod_obj=F,figure=F){
   model_formula_str <- paste0("y_var"," ~ ",right_side_formula)
   
   #in_df <- data.frame(y=y,cos_val=cos_val,sin_val=sin_val)
-  mod <- lm(model_formula_str ,data=in_df)
-  summary(mod)
-  #mod2 <- lm(model_formula_str ,data=in_df,na.action = na.exclude)
-  #mod$coefficients
-  #mod2$coefficients
-  #mod2$model
-  
-  ### Extract coefficients for each harmonic
- 
-  p_val<-2
-  #p
-  #debug(extract_harmonic_coef)
-  test_df<- extract_harmonic_coef(p_val,n,mod)
+  mod <- try(lm(model_formula_str ,data=in_df))
+  if(!inherits(mod,"try-error")){
+    summary(mod)
+    #mod2 <- lm(model_formula_str ,data=in_df,na.action = na.exclude)
+    #mod$coefficients
+    #mod2$coefficients
+    #mod2$model
     
-  harmonic_df <- lapply(p,FUN=extract_harmonic_coef,n=n,mod=mod)
-  
-  ### Figure
-  if(figure==TRUE){
-    y_range <- range(mod$fitted.values,y,na.rm = T)
-    plot(mod$fitted.values,ylim=y_range)
-    points(y,col="blue",pch="+")
+    ### Extract coefficients for each harmonic
+    
+    p_val<-2
+    #p
+    #debug(extract_harmonic_coef)
+    test_df<- extract_harmonic_coef(p_val,n,mod)
+    
+    harmonic_df <- lapply(p,FUN=extract_harmonic_coef,n=n,mod=mod)
+    
+    ### Figure
+    if(figure==TRUE){
+      y_range <- range(mod$fitted.values,y,na.rm = T)
+      plot(mod$fitted.values,ylim=y_range)
+      points(y,col="blue",pch="+")
+    }
+    ###
+    harmonic_obj <- harmonic_df
+    
+  }else{
+    
   }
-  ###
-  harmonic_obj <- harmonic_df
+    
   
   if(mod_obj==T){
     harmonic_obj <- list(harmonic_df=harmonic_df,mod=mod)
@@ -152,11 +158,17 @@ harmonic_regression <- function(y,n,harmonic_val=NULL,mod_obj=F,figure=F){
   #       figure=figure)
   
   #debug(fit_harmonic)
-  l_harmonic_obj <- fit_harmonic(p,n,y,mod_obj=mod_obj,figure=F)
+  l_harmonic_obj <- try(fit_harmonic(p,n,y,mod_obj=mod_obj,figure=F))
+  #handle error:
+  if(inherits(l_harmonic_obj,"try-error")){
+    harmonic_df <- 
+  }else{
+    l_df <- lapply(p,function(i){l_harmonic_obj$harmonic_df[[i]]})
+    harmonic_df <- do.call(rbind,l_df)
+    rownames(harmonic_df) <- NULL
+    
+  }
   
-  l_df <- lapply(p,function(i){l_harmonic_obj$harmonic_df[[i]]})
-  harmonic_df <- do.call(rbind,l_df)
-  rownames(harmonic_df) <- NULL
   
   #View(harmonic_df)
   harmonic_results_obj  <- list(harmonic_df,l_harmonic_obj)
@@ -261,6 +273,7 @@ harmonic_reg_raster <- function(y,var_name,n=24,harmonic_val=NULL){
   
   #n <- layers(y)
   
+  debug(harmonic_regression)
   harmonic_results <-harmonic_regression(y,n=n,
                                          harmonic_val=harmonic_val,
                                          mod_obj=T,figure=F)
