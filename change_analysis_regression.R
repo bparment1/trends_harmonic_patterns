@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/21/2019
+## DATE MODIFIED: 05/22/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -71,7 +71,7 @@ in_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regre
 #ARGS 2
 out_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/outputs"
 #ARGS 3
-infile_name_raster <- "Ouagadougou_MOD13A1_006_NDVI_2001_2016.tif"
+infile_name_raster <- "DarEsSalaam_MOD13A1_006_NDVI_2001_2016.tif"
 #ARGS 4
 #start_date <- "2004-01-01"
 start_date <- "2012-11-01"  #new data starts in November 2012
@@ -80,10 +80,11 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"testing_ts_05162019" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"DarEsSalaam_ts_05222019" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 2 # number of cores
 #range_window <- c("2012-01-01","2017-01-01")
+file_format <- ".tif"
 
 ################# START SCRIPT ###############################
 
@@ -121,6 +122,8 @@ plot(r,y=1)
 NAvalue(r)
 plot(r,y=14,colNA="black")
 
+out_prefix <- basename(sub(file_format,"",infile_name_raster))
+
 ############################
 #### PART II: Generate amplitudes and phases by year and overall
 
@@ -130,8 +133,8 @@ plot(r,y=14,colNA="black")
 harmonic_val <- NULL
 var_name <- "A0" #mean value from Harmonic Fourier
 #raster_name <- NULL
-raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_year.tif"
-file_format <- ".tif"
+raster_name <- paste0(out_prefix,"_amplitude_year",file_format)
+file_format <- file_format
 multiband <- FALSE
 window_val <- 23
 
@@ -153,8 +156,8 @@ list_r_amplitude <- calcHarmonicRaster(r,
 harmonic_val <- NULL
 var_name <- "A"
 #raster_name <- NULL
-raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_year.tif"
-file_format <- ".tif"
+raster_name <- paste0(out_prefix,"_amplitude_year",file_format)
+#file_format <- ".tif" #set above
 multiband <- FALSE
 window_val <- 23
 
