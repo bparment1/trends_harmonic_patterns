@@ -211,7 +211,9 @@ list_r_amplitude <- calcHarmonicRaster(r,
 harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
 #raster_name <- NULL
-raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
+#raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
+raster_name <- paste0(out_prefix,file_format)
+
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- 23
@@ -244,7 +246,9 @@ list_r_amplitude
 harmonic_val <- NULL
 var_name <- "A" #will be included in name
 #raster_name <- NULL
-raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_overall_2001_2016.tif"
+#raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_overall_2001_2016.tif"
+raster_name <- paste0(out_prefix,"_amplitude_overall",file_format)
+
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- NULL #use overall time series
@@ -269,7 +273,9 @@ r_overall_amplitude <- calcHarmonicRaster(r,
 harmonic_val <- NULL
 var_name <- "phase" #will be included in name
 #raster_name <- NULL
-raster_name <- "Ouagadougou_NDVI_MOD13A1_overall_2001_2016.tif"
+#raster_name <- "Ouagadougou_NDVI_MOD13A1_overall_2001_2016.tif"
+raster_name <- paste0(out_prefix,"_overall",file_format)
+
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- NULL #use overall time series
@@ -290,7 +296,8 @@ r_overall_phase <- calcHarmonicRaster(r,
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
 
-raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
+raster_name <- paste0(out_prefix,"_trends_ts",file_format)
+#raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
 file_format <- ".tif"
 method <- "theil_sen"
 var_name <- "slope"
@@ -306,7 +313,8 @@ r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 raster_name=raster_name,
                 out_dir=out_dir)
 
-raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
+raster_name <- paste0(out_prefix,"_trends_ols",file_format)
+#raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
 file_format <- ".tif"
 method <- "ols"
 var_name <- "slope"
@@ -328,10 +336,10 @@ r_overall_ols_NDVI <- calcTrendRaster(r,
 #lf_amp0_wt2 <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_2.*.tif"))
 #rr2 <- stack(lf_amp0_wt2)
 #rr1 <- stack(lf_amp0_wt)
-lf_amp0_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_1.*.tif"))
+lf_amp0_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*.A0_1.*.tif")))
 
-lf_amp1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif"))
-lf_amp2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif"))
+lf_amp1_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*._A_1.tif")))
+lf_amp2_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*._A_2.tif")))
 lf_phase1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif"))
 lf_phase2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif"))
 
