@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/20/2019
+## DATE MODIFIED: 05/21/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -71,8 +71,7 @@ in_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regre
 #ARGS 2
 out_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/outputs"
 #ARGS 3
-#infile_name_raster <- "Ouagadougou_MOD13A1_006_NDVI_2001_2016.tif"
-infile_name_raster <- "DarEsSalaam_MOD13A1_006_NDVI_2001_2016.tif"
+infile_name_raster <- "Ouagadougou_MOD13A1_006_NDVI_2001_2016.tif"
 #ARGS 4
 #start_date <- "2004-01-01"
 start_date <- "2012-11-01"  #new data starts in November 2012
@@ -81,11 +80,9 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"testing_ts_05192019" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"testing_ts_05162019" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 2 # number of cores
-#ARGS 9
-out_prefix <- "Ouagadougou_NDVI_MOD13A1"
 #range_window <- c("2012-01-01","2017-01-01")
 
 ################# START SCRIPT ###############################
@@ -114,9 +111,8 @@ if(create_out_dir_param==TRUE){
 #Create output directory
   
 infile_name_raster <- file.path(in_dir,infile_name_raster)
+#
 #data_df <- read.table(infile_name,header=T,sep=",",stringsAsFactors = F)
-out_raster_name <- sub(file_format,"",raster_name)
-
 r <- brick(infile_name_raster)
 names(r)
 16*23
@@ -134,7 +130,7 @@ plot(r,y=14,colNA="black")
 harmonic_val <- NULL
 var_name <- "A0" #mean value from Harmonic Fourier
 #raster_name <- NULL
-raster_name <- paste0(out_prefix,"_amplitude_year",file_format)
+raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_year.tif"
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- 23
@@ -180,8 +176,7 @@ list_r_amplitude <- calcHarmonicRaster(r,
 harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
 #raster_name <- NULL
-#raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
-raster_name <- paste0(out_prefix,"_year",file_format)
+raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- 23
@@ -215,8 +210,6 @@ harmonic_val <- NULL
 var_name <- "A" #will be included in name
 #raster_name <- NULL
 raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_overall_2001_2016.tif"
-raster_name <- paste0(out_prefix,"_amplitude_overall",file_format)
-
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- NULL #use overall time series
@@ -233,6 +226,7 @@ r_overall_amplitude <- calcHarmonicRaster(r,
                                          raster_name=raster_name,
                                          out_dir=out_dir)
 
+
 ######################
 #### Generate Overall phase A1 and A2 (seaonality and bi-annual signal)
 
@@ -240,8 +234,7 @@ r_overall_amplitude <- calcHarmonicRaster(r,
 harmonic_val <- NULL
 var_name <- "phase" #will be included in name
 #raster_name <- NULL
-#raster_name <- "Ouagadougou_NDVI_MOD13A1_overall_2001_2016.tif"
-raster_name <- paste0(out_prefix,"_overall",file_format)
+raster_name <- "Ouagadougou_NDVI_MOD13A1_overall_2001_2016.tif"
 file_format <- ".tif"
 multiband <- FALSE
 window_val <- NULL #use overall time series
@@ -262,8 +255,7 @@ r_overall_phase <- calcHarmonicRaster(r,
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
 
-#raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
-raster_name <- paste0(out_prefix,"_trend_ts",file_format)
+raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
 file_format <- ".tif"
 method <- "theil_sen"
 var_name <- "slope"
@@ -279,8 +271,7 @@ r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 raster_name=raster_name,
                 out_dir=out_dir)
 
-#raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
-raster_name <- paste0(out_prefix,"_trend_ols",file_format)
+raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
 file_format <- ".tif"
 method <- "ols"
 var_name <- "slope"
@@ -298,23 +289,26 @@ r_overall_ols_NDVI <- calcTrendRaster(r,
 ################### PART V: Generate trend from phase and amplitude parameters
 ### Now trend by STA parameters:
 
-raster_name <- paste0(out_prefix,"_amplitude_year",file_format)
+#lf_amp0_wt <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_1.*.tif"))
+#lf_amp0_wt2 <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_2.*.tif"))
+#rr2 <- stack(lf_amp0_wt2)
+#rr1 <- stack(lf_amp0_wt)
+lf_amp0_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*.A0_1.*.tif"))
 
-lf_amp0_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_0.tif")
-lf_amp1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif")
-lf_amp2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif")
-lf_phase1_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif")
-lf_phase2_w <- list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif")
+lf_amp1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_1.tif"))
+lf_amp2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_amplitude_year_.*._A_2.tif"))
+lf_phase1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif"))
+lf_phase2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif"))
 
 list_params <- list(lf_amp0_w,lf_amp1_w,lf_amp2_w,lf_phase1_w,lf_phase2_w)
 names(list_params) <- c("A0","A1","A2","phase1","phase2")
 
-no_param <- length(no_param)
+no_param <- length(list_params)
 
 for(i in 1:no_param){
   
-  param_name <- list_params[i]
-  
+  param_name <- names(list_params[i])
+
   raster_name <- paste0("Ouagadougou_NDVI_MOD13A1_trend_ts_",param_name,file_format)
   
   file_format <- ".tif"
@@ -322,6 +316,7 @@ for(i in 1:no_param){
   var_name <- "slope"
   
   #undebug(calcTrendRaster)
+  r <- stack(list_params[[i]])
   
   r__theilsen_NDVI <- calcTrendRaster(r,
                                              method=method,
