@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/22/2019
+## DATE MODIFIED: 05/23/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -58,7 +58,7 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 #Benoit setup
 script_path <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/scripts"
 
-harmonic_regression_functions <- "harmonic_regression_functions_05182019.R"
+harmonic_regression_functions <- "harmonic_regression_functions_05232019.R"
 trend_methods_time_series_functions <- "trend_methods_time_series_functions_05212019.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
@@ -82,7 +82,7 @@ create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
 out_suffix <-"DarEsSalaam_ts_05222019" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
-num_cores <- 2 # number of cores
+num_cores <- 3 # number of cores
 #range_window <- c("2012-01-01","2017-01-01")
 file_format <- ".tif"
 
@@ -137,6 +137,38 @@ raster_name <- paste0(out_prefix,"_amplitude_year",file_format)
 file_format <- file_format
 multiband <- FALSE
 window_val <- 23
+
+df_test <- as.data.frame(r)
+y <- as.numeric(df_test[1,])
+nrow(df_test)
+df_test <- as.data.frame(t(df_test))
+y <- df_test[[1]]
+
+  
+list_predicted_val <- mclapply(df_test[,1:3],
+                             FUN=harmonic_reg_raster,
+                             var_name,
+                             window_val,
+                             harmonic_val,
+                             mc.preschedule = FALSE,
+                             mc.cores =num_cores)
+
+list_predicted_val <- mclapply(df_test,
+                               FUN=harmonic_reg_raster,
+                               var_name,
+                               window_val,
+                               harmonic_val,
+                               mc.preschedule = FALSE,
+                               mc.cores =num_cores)
+
+list_predicted_val[[963]] #error
+
+#undebug(harmonic_reg_raster)
+y <- df_test[[963]]
+### still error message but now dealt with
+test <- harmonic_reg_raster(y,var_name,
+                            n=window_val,
+                            harmonic_val=NULL)
 
 #debug(calcHarmonicRaster)
 
