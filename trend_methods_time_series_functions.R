@@ -50,15 +50,15 @@ library(mblm)
 
 ###### Functions used in this script and sourced from other files
 
-calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
+calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
   #y,n,harmonic_val=NULL,mod_obj=F,figure=F
   #This function generates Theil Sen slope estimate using mblm package.
   #
   #INPUTS
   #1) y:  y variable (trend variable)
-  #2) mod_obj: save mod obj?
-  #4) method: theil sen or ols option for trend
-  #
+  #2) mod_obj: if TRUE, return model object 
+  #3) method: theil sen or ols option for trend
+  #5) save_opt: save model object to disk
   #OUTPUTS
   #1)
   #
@@ -105,13 +105,6 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
   
   ##### Extract information from model object mblm
   
-  #slope_theil_sen <- coef(mod_mblm)[2]
-  #intercept_theil_sen <- coef(mod_mblm)[1]
-    harmonic_df <- lapply(1:length(p),
-                          FUN=function(i) {harmonic_df <- data.frame(A0=NA,A=NA,a=NA,b=NA,
-                                                                     pr_A0=NA,pr_a=NA,pr_b=NA,
-                                                                     phase=NA,harmonic=NA,omega=NA)}
-    
   if(!inherits(mod_obj,"try-error")){
     slope <- coef(mod_obj)[2]
     intercept <- coef(mod_obj)[1]
@@ -151,11 +144,14 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
                              n_obs=n_obs)#number of valid observation (not NA) 
   
   #### Prepare object to return
+  if(mod_obj==FALSE){
+    mod_obj <- NULL
+  }
+  
   trend_obj <- list(mod_obj,df_trend)
   names(trend_obj) <- c("mod_obj","df_trend")
   
   ##### save to disk
-  
   #if(mod_obj==TRUE){
     #obj_theil_sen_filename <- file.path(out_dir,paste("theil_sen_obj_",subset_name,"_",out_suffix,".RData",sep=""))
     #save(obj_theil_sen,file= obj_theil_sen_filename)
@@ -183,7 +179,7 @@ trend_reg_raster <- function(y,var_name,method="theil_sen"){
   
   trend_results <- calculate_trend(y,
                                    mod_obj=F,
-                                   method="theil_sen")
+                                   method=method)
     
   #df_in <- subset(harmonic_results$harmonic_df,harmonic==harmonic)
   df_in <- trend_results$df_trend
