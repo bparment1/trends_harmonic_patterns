@@ -4,7 +4,7 @@
 ## Performing trend analyses of time series data to with theil sen, OLS and Mann Kendall.
 ##
 ## DATE CREATED: 08/11/2017
-## DATE MODIFIED: 05/15/2019
+## DATE MODIFIED: 05/24/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Time series analysis 
@@ -88,7 +88,9 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
     formula_str <- paste0(names(df_val)[1]," ~ ","time_index")
     formula_val <- as.formula(formula_str) #transform object into formula
     
-    mod_obj <- mblm(formula_val,df_val)
+    mod_obj <- try(mblm(formula_val,df_val))
+               #,silent=T)
+  
   }
   
   if(method=="ols"){
@@ -97,21 +99,35 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
     formula_str <- paste0(names(df_val)[1]," ~ ","time_index")
     formula_val <- as.formula(formula_str) #transform object into formula
     
-    mod_obj <- lm(formula_val,df_val)
-    
+    mod_obj <- try(lm(formula_val,df_val))
+               #,silent=T)
   }
   
   ##### Extract information from model object mblm
   
   #slope_theil_sen <- coef(mod_mblm)[2]
   #intercept_theil_sen <- coef(mod_mblm)[1]
-  
-  slope <- coef(mod_obj)[2]
-  intercept <- coef(mod_obj)[1]
+    harmonic_df <- lapply(1:length(p),
+                          FUN=function(i) {harmonic_df <- data.frame(A0=NA,A=NA,a=NA,b=NA,
+                                                                     pr_A0=NA,pr_a=NA,pr_b=NA,
+                                                                     phase=NA,harmonic=NA,omega=NA)}
+    
+  if(!inherits(mod_obj,"try-error")){
+    slope <- coef(mod_obj)[2]
+    intercept <- coef(mod_obj)[1]
+    n_obs <- sum(!is.na(y))
+    n <- length(y)
+    slope_sign <- sign(slope)
+  }else{
+    slope <- NA
+    intercept <- NA
+    n_obs <- NA
+    n <- NA
+    slope_sign <- NA
+  }
   
   #ID_ts <- subset_name
   #method_str <- "theil_sen"
-  n_obs <- sum(!is.na(y))
   
   if(!is.null(dates_val)){
     nt <- length(dates_val)
@@ -123,8 +139,6 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen"){
     end_date <- NA
   }
   
-  n <- length(y)
-  slope_sign <- sign(slope)
   #slope_sign <- sign(slope_theil_sen)
   
   df_trend <- data.frame(intercept=intercept,
