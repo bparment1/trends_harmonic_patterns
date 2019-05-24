@@ -88,7 +88,7 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
     formula_str <- paste0(names(df_val)[1]," ~ ","time_index")
     formula_val <- as.formula(formula_str) #transform object into formula
     
-    mod_obj <- try(mblm(formula_val,df_val))
+    mod <- try(mblm(formula_val,df_val))
                #,silent=T)
   
   }
@@ -99,15 +99,15 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
     formula_str <- paste0(names(df_val)[1]," ~ ","time_index")
     formula_val <- as.formula(formula_str) #transform object into formula
     
-    mod_obj <- try(lm(formula_val,df_val))
+    mod <- try(lm(formula_val,df_val))
                #,silent=T)
   }
   
   ##### Extract information from model object mblm
   
-  if(!inherits(mod_obj,"try-error")){
-    slope <- coef(mod_obj)[2]
-    intercept <- coef(mod_obj)[1]
+  if(!inherits(mod,"try-error")){
+    slope <- coef(mod)[2]
+    intercept <- coef(mod)[1]
     n_obs <- sum(!is.na(y))
     n <- length(y)
     slope_sign <- sign(slope)
@@ -145,17 +145,17 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
   
   #### Prepare object to return
   if(mod_obj==FALSE){
-    mod_obj <- NULL
+    mod <- NULL
   }
   
-  trend_obj <- list(mod_obj,df_trend)
-  names(trend_obj) <- c("mod_obj","df_trend")
+  trend_obj <- list(mod,df_trend)
+  names(trend_obj) <- c("mod","df_trend")
   
   ##### save to disk
-  #if(mod_obj==TRUE){
-    #obj_theil_sen_filename <- file.path(out_dir,paste("theil_sen_obj_",subset_name,"_",out_suffix,".RData",sep=""))
-    #save(obj_theil_sen,file= obj_theil_sen_filename)
-  #} 
+  if(save_opt==TRUE){
+    obj_filename <- file.path(".",paste("method_mod",".RData",sep=""))
+    save(trend_obj,file= obj_filename)
+  } 
   
   return(trend_obj)
 }
@@ -176,7 +176,7 @@ trend_reg_raster <- function(y,var_name,method="theil_sen"){
   ####### Start script #######
   
   #n <- layers(y)
-  
+  #debug(calculate_trend)
   trend_results <- calculate_trend(y,
                                    mod_obj=F,
                                    method=method)
