@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/23/2019
+## DATE MODIFIED: 05/24/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -59,7 +59,7 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 script_path <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/scripts"
 
 harmonic_regression_functions <- "harmonic_regression_functions_05232019.R"
-trend_methods_time_series_functions <- "trend_methods_time_series_functions_05212019.R"
+trend_methods_time_series_functions <- "trend_methods_time_series_functions_05242019.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
 
@@ -83,8 +83,10 @@ create_out_dir_param=TRUE #create a new ouput dir if TRUE
 out_suffix <-"DarEsSalaam_ts_05222019" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 3 # number of cores
-#range_window <- c("2012-01-01","2017-01-01")
+#ARGS 9
 file_format <- ".tif"
+#ARGS 10
+#range_window <- c("2012-01-01","2017-01-01")
 
 ################# START SCRIPT ###############################
 
@@ -296,7 +298,7 @@ r_overall_phase <- calcHarmonicRaster(r,
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
 
-raster_name <- paste0(out_prefix,"_trends_ts",file_format)
+raster_name <- paste0(out_prefix,"overall_trends_ts",file_format)
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
 file_format <- ".tif"
 method <- "theil_sen"
@@ -313,7 +315,7 @@ r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 raster_name=raster_name,
                 out_dir=out_dir)
 
-raster_name <- paste0(out_prefix,"_trends_ols",file_format)
+raster_name <- paste0(out_prefix,"overall_trends_ols",file_format)
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
 file_format <- ".tif"
 method <- "ols"
@@ -337,11 +339,10 @@ r_overall_ols_NDVI <- calcTrendRaster(r,
 #rr2 <- stack(lf_amp0_wt2)
 #rr1 <- stack(lf_amp0_wt)
 lf_amp0_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*.A0_1.*.tif")))
-
 lf_amp1_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*._A_1.tif")))
 lf_amp2_w <- mixedsort(list.files(pattern=paste0(out_prefix,"_amplitude_year_.*._A_2.tif")))
-lf_phase1_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_1.tif"))
-lf_phase2_w <- mixedsort(list.files(pattern="Ouagadougou_NDVI_MOD13A1_year_.*._phase_2.tif"))
+lf_phase1_w <- mixedsort(list.files(pattern=paste0(out_prefix,".*._phase_1.tif")))
+lf_phase2_w <- mixedsort(list.files(pattern=paste0(out_prefix,".*._phase_2.tif")))
 
 list_params <- list(lf_amp0_w,lf_amp1_w,lf_amp2_w,lf_phase1_w,lf_phase2_w)
 names(list_params) <- c("A0","A1","A2","phase1","phase2")
@@ -352,8 +353,7 @@ for(i in 1:no_param){
   
   param_name <- names(list_params[i])
 
-  raster_name <- paste0("Ouagadougou_NDVI_MOD13A1_trend_ts_",param_name,file_format)
-  
+  raster_name <- paste0(out_prefix,"_trend_ts_",param_name,file_format)
   file_format <- ".tif"
   method <- "theil_sen"
   var_name <- "slope"
@@ -370,7 +370,7 @@ for(i in 1:no_param){
                                              raster_name=raster_name,
                                              out_dir=out_dir)
   
-  raster_name <- paste0("Ouagadougou_NDVI_MOD13A1_trend_ols_",param_name,file_format)
+  raster_name <- paste0(out_prefix,"_trend_ols_",param_name,file_format)
   
   file_format <- ".tif"
   method <- "ols"
@@ -387,6 +387,7 @@ for(i in 1:no_param){
   
 }
   
+
 ################################### End of script #######################################
 
   
