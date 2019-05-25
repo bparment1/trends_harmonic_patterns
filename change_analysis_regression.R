@@ -59,7 +59,7 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 script_path <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/scripts"
 
 harmonic_regression_functions <- "harmonic_regression_functions_05232019.R"
-trend_methods_time_series_functions <- "trend_methods_time_series_functions_05242019.R"
+trend_methods_time_series_functions <- "trend_methods_time_series_functions_05242019c.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
 
@@ -214,7 +214,7 @@ harmonic_val <- NULL
 var_name <- "phase" #wiill be included in name
 #raster_name <- NULL
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_year.tif"
-raster_name <- paste0(out_prefix,file_format)
+raster_name <- paste0(out_prefix,"_year",file_format)
 
 file_format <- ".tif"
 multiband <- FALSE
@@ -361,6 +361,24 @@ for(i in 1:no_param){
   #undebug(calcTrendRaster)
   r <- stack(list_params[[i]])
   
+  df_test <- as.data.frame(r)
+  y <- as.numeric(df_test[1,])
+  nrow(df_test)
+  df_test <- as.data.frame(t(df_test))
+  y <- df_test[[1]]
+  
+  #debug(trend_reg_raster)
+  test <- trend_reg_raster(y,
+                   var_name,
+                   method)
+  
+  list_predicted_trend <- mclapply(df_test[,1:3],
+                                 FUN=trend_reg_raster,
+                                 var_name,
+                                 method,
+                                 mc.preschedule = FALSE,
+                                 mc.cores =num_cores)
+  
   r__theilsen_NDVI <- calcTrendRaster(r,
                                              method=method,
                                              var_name=var_name,
@@ -369,6 +387,9 @@ for(i in 1:no_param){
                                              num_cores=1,
                                              raster_name=raster_name,
                                              out_dir=out_dir)
+  
+  r_ts <- raster(r__theilsen_NDVI)
+  plot(r_ts,zlim=c(-0.1,0.1))
   
   raster_name <- paste0(out_prefix,"_trend_ols_",param_name,file_format)
   
