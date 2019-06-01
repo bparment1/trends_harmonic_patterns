@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/24/2019
+## DATE MODIFIED: 05/28/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -58,8 +58,8 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 #Benoit setup
 script_path <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/scripts"
 
-harmonic_regression_functions <- "harmonic_regression_functions_05232019.R"
-trend_methods_time_series_functions <- "trend_methods_time_series_functions_05242019c.R"
+harmonic_regression_functions <- "harmonic_regression_functions_05282019.R"
+trend_methods_time_series_functions <- "trend_methods_time_series_functions_05282019.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
 
@@ -71,7 +71,7 @@ in_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regre
 #ARGS 2
 out_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/outputs"
 #ARGS 3
-infile_name_raster <- "DarEsSalaam_MOD13A1_006_NDVI_2001_2016.tif"
+infile_name_raster <- "Kampala_MOD13A1_006_NDVI_2001_2016.tif"
 #ARGS 4
 #start_date <- "2004-01-01"
 start_date <- "2012-11-01"  #new data starts in November 2012
@@ -80,13 +80,15 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"DarEsSalaam_ts_05222019" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"Kampala_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 3 # number of cores
 #ARGS 9
 file_format <- ".tif"
 #ARGS 10
 #range_window <- c("2012-01-01","2017-01-01")
+#ARGS 11
+out_prefix <- NA
 
 ################# START SCRIPT ###############################
 
@@ -124,7 +126,9 @@ plot(r,y=1)
 NAvalue(r)
 plot(r,y=14,colNA="black")
 
-out_prefix <- basename(sub(file_format,"",infile_name_raster))
+if(is.null(out_prefix)){
+  out_prefix <- basename(sub(file_format,"",infile_name_raster))
+}
 
 ############################
 #### PART II: Generate amplitudes and phases by year and overall
@@ -146,7 +150,6 @@ nrow(df_test)
 df_test <- as.data.frame(t(df_test))
 y <- df_test[[1]]
 
-  
 list_predicted_val <- mclapply(df_test[,1:3],
                              FUN=harmonic_reg_raster,
                              var_name,
@@ -174,15 +177,15 @@ test <- harmonic_reg_raster(y,var_name,
 
 #debug(calcHarmonicRaster)
 
-list_r_amplitude <- calcHarmonicRaster(r,
-                                       harmonic_val=harmonic_val,
-                                       var_name=var_name,
-                                       window_val=window_val,
-                                       file_format=file_format,
-                                       multiband=multiband,
-                                       num_cores=num_cores,
-                                       raster_name=raster_name,
-                                       out_dir=out_dir)
+  list_r_amplitude <- calcHarmonicRaster(r,
+                                         harmonic_val=harmonic_val,
+                                         var_name=var_name,
+                                         window_val=window_val,
+                                         file_format=file_format,
+                                         multiband=multiband,
+                                         num_cores=num_cores,
+                                         raster_name=raster_name,
+                                         out_dir=out_dir)
 
 ###################
 #### Generate Amplitudes A1 and A2 (seaonality and bi-annual signal)
@@ -298,7 +301,7 @@ r_overall_phase <- calcHarmonicRaster(r,
 ##############################
 ###### Now get the trend from stack (OLS and Theil Sen, as well as Kendall)
 
-raster_name <- paste0(out_prefix,"overall_trends_ts",file_format)
+raster_name <- paste0(out_prefix,"_overall_trends_ts",file_format)
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ts.tif"
 file_format <- ".tif"
 method <- "theil_sen"
@@ -315,7 +318,7 @@ r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 raster_name=raster_name,
                 out_dir=out_dir)
 
-raster_name <- paste0(out_prefix,"overall_trends_ols",file_format)
+raster_name <- paste0(out_prefix,"_overall_trends_ols",file_format)
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
 file_format <- ".tif"
 method <- "ols"
@@ -411,4 +414,4 @@ for(i in 1:no_param){
 
 ################################### End of script #######################################
 
-  
+    
