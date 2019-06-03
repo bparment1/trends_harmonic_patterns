@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 05/28/2019
+## DATE MODIFIED: 06/10/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -58,8 +58,8 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 #Benoit setup
 script_path <- "/media/dan/Data/trend_and_harmonic_regression/scripts"
 
-harmonic_regression_functions <- "harmonic_regression_functions_06032019.R"
-trend_methods_time_series_functions <- "trend_methods_time_series_functions_06032019.R"
+harmonic_regression_functions <- "harmonic_regression_functions_06042019.R"
+trend_methods_time_series_functions <- "trend_methods_time_series_functions_06102019.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
 
@@ -68,11 +68,11 @@ source(file.path(script_path,trend_methods_time_series_functions))
 
 #ARGS 1
 in_dir <- "/media/dan/Data/trend_and_harmonic_regression/data"
-
+#data in:/media/dan/processed/MOD13A1/latlong
 #ARGS 2
 out_dir <- "/media/dan/Data/trend_and_harmonic_regression/outputs"
 #ARGS 3
-infile_name_raster <- "Kampala_MOD13A1_006_NDVI_2001_2016.tif"
+infile_name_raster <- "Dakar_MOD13A1_006_NDVI_2001_2016.tif"
 #ARGS 4
 #start_date <- "2004-01-01"
 start_date <- "2012-11-01"  #new data starts in November 2012
@@ -81,7 +81,7 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"test_Kampala_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"Dakar_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 3 # number of cores
 #ARGS 9
@@ -310,6 +310,64 @@ var_name <- "slope"
 
 #undebug(calcTrendRaster)
 
+df_test <- as.data.frame(r)
+y <- as.numeric(df_test[1,])
+nrow(df_test)
+df_test <- as.data.frame(t(df_test))
+y <- df_test[[1]]
+dim(df_test)
+debug(trend_reg_raster)
+test = trend_reg_raster(df_test[1,],
+                        var_name,
+                        method)
+#trend_reg_raster <- function(y,var_name,method="theil_sen"){
+  
+undebug(trend_reg_raster)
+
+list_predicted_val <- mcmapply(trend_reg_raster,
+                               y=df_test[,1:3],
+                               var_name,
+                               method,
+                               mc.preschedule = FALSE,
+                               mc.cores =num_cores)
+
+list_predicted_val <- mcmapply(trend_reg_raster,
+                               y=df_test,
+                               var_name,
+                               method,
+                               mc.preschedule = FALSE,
+                               mc.cores =num_cores)
+val <- unlist(list_predicted_val)
+class(val)
+length(val)
+min(val,na.rm=T)
+max(val,na.rm=T)
+
+index_error <- lapply(1:length(list_predicted_val),
+       FUN=function(i){inherits(list_predicted_val[i],"try-error")})
+
+list_predicted_val[index_error]
+remove_errors_list<-function(list_items){
+  
+  #This function removes "error" items in a list
+  list_tmp<-list_items
+  if(is.null(names(list_tmp))){
+    names(list_tmp) <- paste("l",1:length(list_tmp),sep="_")
+    names(list_items) <- paste("l",1:length(list_tmp),sep="_")
+  }
+  
+  for(i in 1:length(list_items)){
+    if(inherits(list_items[[i]],"try-error")){
+      list_tmp[[i]]<-0
+    }else{
+      list_tmp[[i]]<-1
+    }
+  }
+  cnames<-names(list_tmp[list_tmp>0])
+  x <- list_items[match(cnames,names(list_items))]
+  return(x)
+}
+
 r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 method=method,
                 var_name=var_name,
@@ -318,6 +376,7 @@ r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 num_cores=1,
                 raster_name=raster_name,
                 out_dir=out_dir)
+#50 warnings.
 
 raster_name <- paste0(out_prefix,"_overall_trends_ols",file_format)
 #raster_name <- "Ouagadougou_NDVI_MOD13A1_trend_ols.tif"
