@@ -56,10 +56,10 @@ create_dir_fun <- function(outDir,out_suffix=NULL){
 }
 
 #Benoit setup
-script_path <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/scripts"
+script_path <- "/media/dan/Data/trend_and_harmonic_regression/scripts"
 
-harmonic_regression_functions <- "harmonic_regression_functions_05282019.R"
-trend_methods_time_series_functions <- "trend_methods_time_series_functions_05282019.R"
+harmonic_regression_functions <- "harmonic_regression_functions_06032019.R"
+trend_methods_time_series_functions <- "trend_methods_time_series_functions_06032019.R"
 source(file.path(script_path,harmonic_regression_functions))
 source(file.path(script_path,trend_methods_time_series_functions))
 
@@ -67,9 +67,10 @@ source(file.path(script_path,trend_methods_time_series_functions))
 #####  Parameters and argument set up ###########
 
 #ARGS 1
-in_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/data"
+in_dir <- "/media/dan/Data/trend_and_harmonic_regression/data"
+
 #ARGS 2
-out_dir <- "/home/bparmentier/Data/Benoit/BELSPO_malaria/trend_and_harmonic_regression/outputs"
+out_dir <- "/media/dan/Data/trend_and_harmonic_regression/outputs"
 #ARGS 3
 infile_name_raster <- "Kampala_MOD13A1_006_NDVI_2001_2016.tif"
 #ARGS 4
@@ -80,7 +81,7 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"Kampala_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"test_Kampala_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 3 # number of cores
 #ARGS 9
@@ -88,7 +89,7 @@ file_format <- ".tif"
 #ARGS 10
 #range_window <- c("2012-01-01","2017-01-01")
 #ARGS 11
-out_prefix <- NA
+out_prefix <- NULL
 
 ################# START SCRIPT ###############################
 
