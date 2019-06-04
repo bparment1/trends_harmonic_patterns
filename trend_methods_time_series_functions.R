@@ -4,7 +4,7 @@
 ## Performing trend analyses of time series data to with theil sen, OLS and Mann Kendall.
 ##
 ## DATE CREATED: 08/11/2017
-## DATE MODIFIED: 05/24/2019
+## DATE MODIFIED: 06/04/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Time series analysis 
@@ -67,6 +67,7 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
   ############# BEGIN FUNCTION #############
   
   #setting up the data input: data.frame with 2 columns
+  y <- as.numeric(y) #making sure we have a column vector
   time_index <- 1:length(y) #
 
   #stores dates for later processing
@@ -78,6 +79,7 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
   
   dates_val <- NULL # set this later
   
+  
   df_val <- data.frame(y=y,time_index=time_index) #convert to data.frame since it was a zoo df
   #df_mblm$time_index <- time_index
   #names(df_mblm)
@@ -88,8 +90,8 @@ calculate_trend <- function(y,mod_obj=F,method="theil_sen",save_opt=F){
     formula_str <- paste0(names(df_val)[1]," ~ ","time_index")
     formula_val <- as.formula(formula_str) #transform object into formula
     
-    mod <- try(mblm(formula_val,df_val))
-               #,silent=T)
+    mod <- try(mblm(formula_val,df_val)
+               ,silent=T)
   
   }
   
