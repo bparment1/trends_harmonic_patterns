@@ -4,7 +4,7 @@
 ## Performing trend analyses of time series data to with theil sen, OLS and Mann Kendall.
 ##
 ## DATE CREATED: 08/11/2017
-## DATE MODIFIED: 06/04/2019
+## DATE MODIFIED: 06/10/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Time series analysis 
