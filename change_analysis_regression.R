@@ -2,7 +2,7 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 06/10/2019
+## DATE MODIFIED: 07/11/2019
 ## AUTHORS: Benoit Parmentier
 ## Version: 1
 ## PROJECT: Belspo
@@ -72,7 +72,8 @@ in_dir <- "/media/dan/Data/trend_and_harmonic_regression/data"
 #ARGS 2
 out_dir <- "/media/dan/Data/trend_and_harmonic_regression/outputs"
 #ARGS 3
-infile_name_raster <- "Dakar_MOD13A1_006_NDVI_2001_2016.tif"
+infile_name_raster <- "Ouagadougou_MOD13A1_006_NDVI_2001_2016.tif"
+
 #ARGS 4
 #start_date <- "2004-01-01"
 start_date <- "2012-11-01"  #new data starts in November 2012
@@ -81,7 +82,7 @@ end_date <- NULL
 #ARGS 6
 create_out_dir_param=TRUE #create a new ouput dir if TRUE
 #ARGS 7
-out_suffix <-"Dakar_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
+out_suffix <-"Ouagadougou_MOD13A1_006_NDVI" #output suffix for the files and ouptut folder #param 12
 #ARGS 8
 num_cores <- 3 # number of cores
 #ARGS 9
@@ -121,7 +122,9 @@ infile_name_raster <- file.path(in_dir,infile_name_raster)
 #data_df <- read.table(infile_name,header=T,sep=",",stringsAsFactors = F)
 r <- brick(infile_name_raster)
 names(r)
-16*23
+#if not true, we have missing layers, this should be spotted using the time series names(dates)/
+#Date should be added as descriptions in the tif!!
+nlayers(r)==16*23
 
 plot(r,y=1)
 NAvalue(r)
@@ -145,40 +148,14 @@ file_format <- file_format
 multiband <- FALSE
 window_val <- 23
 
-df_test <- as.data.frame(r)
-y <- as.numeric(df_test[1,])
-nrow(df_test)
-df_test <- as.data.frame(t(df_test))
-y <- df_test[[1]]
 
-list_predicted_val <- mclapply(df_test[,1:3],
-                             FUN=harmonic_reg_raster,
-                             var_name,
-                             window_val,
-                             harmonic_val,
-                             mc.preschedule = FALSE,
-                             mc.cores =num_cores)
-
-list_predicted_val <- mclapply(df_test,
-                               FUN=harmonic_reg_raster,
-                               var_name,
-                               window_val,
-                               harmonic_val,
-                               mc.preschedule = FALSE,
-                               mc.cores =num_cores)
-
-list_predicted_val[[963]] #error
-
-#undebug(harmonic_reg_raster)
-y <- df_test[[963]]
-### still error message but now dealt with
-test <- harmonic_reg_raster(y,var_name,
-                            n=window_val,
-                            harmonic_val=NULL)
+#test <- harmonic_reg_raster(y,var_name,
+#                            n=window_val,
+#                            harmonic_val=NULL)
 
 #debug(calcHarmonicRaster)
 
-  list_r_amplitude <- calcHarmonicRaster(r,
+list_r_amplitude <- calcHarmonicRaster(r,
                                          harmonic_val=harmonic_val,
                                          var_name=var_name,
                                          window_val=window_val,
@@ -251,8 +228,6 @@ plot(r_phase,y=1)
 list_r_amplitude
 harmonic_val <- NULL
 var_name <- "A" #will be included in name
-#raster_name <- NULL
-#raster_name <- "Ouagadougou_NDVI_MOD13A1_amplitude_overall_2001_2016.tif"
 raster_name <- paste0(out_prefix,"_amplitude_overall",file_format)
 
 file_format <- ".tif"
