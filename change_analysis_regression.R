@@ -2,9 +2,9 @@
 ##
 ## Using functions to generate environmental change variables for cities.
 ## DATE CREATED: 05/16/2019
-## DATE MODIFIED: 07/11/2019
+## DATE MODIFIED: 07/15/2019
 ## AUTHORS: Benoit Parmentier
-## Version: 1
+## Version: 2
 ## PROJECT: Belspo
 ## ISSUE: 
 ## TO DO:
@@ -283,66 +283,6 @@ file_format <- ".tif"
 method <- "theil_sen"
 var_name <- "slope"
 
-#undebug(calcTrendRaster)
-
-df_test <- as.data.frame(r)
-y <- as.numeric(df_test[1,])
-nrow(df_test)
-df_test <- as.data.frame(t(df_test))
-y <- df_test[[1]]
-dim(df_test)
-debug(trend_reg_raster)
-test = trend_reg_raster(df_test[1,],
-                        var_name,
-                        method)
-#trend_reg_raster <- function(y,var_name,method="theil_sen"){
-  
-undebug(trend_reg_raster)
-
-list_predicted_val <- mcmapply(trend_reg_raster,
-                               y=df_test[,1:3],
-                               var_name,
-                               method,
-                               mc.preschedule = FALSE,
-                               mc.cores =num_cores)
-
-list_predicted_val <- mcmapply(trend_reg_raster,
-                               y=df_test,
-                               var_name,
-                               method,
-                               mc.preschedule = FALSE,
-                               mc.cores =num_cores)
-val <- unlist(list_predicted_val)
-class(val)
-length(val)
-min(val,na.rm=T)
-max(val,na.rm=T)
-
-index_error <- lapply(1:length(list_predicted_val),
-       FUN=function(i){inherits(list_predicted_val[i],"try-error")})
-
-list_predicted_val[index_error]
-remove_errors_list<-function(list_items){
-  
-  #This function removes "error" items in a list
-  list_tmp<-list_items
-  if(is.null(names(list_tmp))){
-    names(list_tmp) <- paste("l",1:length(list_tmp),sep="_")
-    names(list_items) <- paste("l",1:length(list_tmp),sep="_")
-  }
-  
-  for(i in 1:length(list_items)){
-    if(inherits(list_items[[i]],"try-error")){
-      list_tmp[[i]]<-0
-    }else{
-      list_tmp[[i]]<-1
-    }
-  }
-  cnames<-names(list_tmp[list_tmp>0])
-  x <- list_items[match(cnames,names(list_items))]
-  return(x)
-}
-
 r_overall_theilsen_NDVI <- calcTrendRaster(r,
                 method=method,
                 var_name=var_name,
@@ -399,24 +339,7 @@ for(i in 1:no_param){
   #undebug(calcTrendRaster)
   r <- stack(list_params[[i]])
   
-  df_test <- as.data.frame(r)
-  y <- as.numeric(df_test[1,])
-  nrow(df_test)
-  df_test <- as.data.frame(t(df_test))
-  y <- df_test[[1]]
-  
-  #debug(trend_reg_raster)
-  test <- trend_reg_raster(y,
-                   var_name,
-                   method)
-  
-  list_predicted_trend <- mclapply(df_test[,1:3],
-                                 FUN=trend_reg_raster,
-                                 var_name,
-                                 method,
-                                 mc.preschedule = FALSE,
-                                 mc.cores =num_cores)
-  
+
   r__theilsen_NDVI <- calcTrendRaster(r,
                                              method=method,
                                              var_name=var_name,
